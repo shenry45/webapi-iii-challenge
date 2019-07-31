@@ -4,6 +4,8 @@ const userDB = require('./userDb.js');
 
 const router = express.Router();
 
+// ROUTES
+
 router.post('/', validateUser, async (req, res) => {
   const user = req.body;
 
@@ -65,11 +67,25 @@ router.delete('/:id', validateUserId, async (req, res) => {
   })
 });
 
-router.put('/:id', validateUserId, (req, res) => {
+router.put('/:id', async (req, res) => {
+  try {
+    const {id} = req.params;
+    const user = req.body;
 
+    const userInfo = await userDB.update(id, user);
+  
+    res.status(200).json({
+      success: true,
+      message: userInfo
+    })
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    })
+  }
 });
 
-//custom middleware
+// CUSTOM MIDDLEWARE
 
 async function validateUserId(req, res, next) {
   const {id} = req.params;
@@ -90,7 +106,6 @@ async function validateUserId(req, res, next) {
 function validateUser(req, res, next) {
   if (req.body) {
     if (req.body.name) {
-      console.log('passed validateUser');
       next();
     } else {
       res.status(400).json({
