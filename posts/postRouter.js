@@ -49,8 +49,21 @@ router.get('/:id', getReqBody, async (req, res) => {
   }
 });
 
-router.delete('/:id', (req, res) => {
-
+router.delete('/:id', async (req, res) => {
+  try {
+    const {id} = req.params;
+    const postInfo = await db.remove(id);
+    
+    res.status(200).json({
+      success: true,
+      post: postInfo
+    })
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
 });
 
 router.put('/:id', (req, res) => {
